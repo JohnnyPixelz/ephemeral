@@ -1,0 +1,16 @@
+services:
+  ephemeral:
+    build: .
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      HOSTNAME: "0.0.0.0"
+      MAX_FILE_AGE: 600000
+    ports:
+      - "3000:3000"  # Maps host port 3000 to container port 3000
+    restart: always  # Restarts the container automatically on failure
+    volumes:
+      - app-data:/app/data  # Volume for persistent storage
+
+volumes:
+  app-data:

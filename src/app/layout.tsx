@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
+import { ThemeProvider } from "next-themes";
 import "./globals.css";
-import { ThemeProvider } from "@/components/theme-provider";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -16,7 +16,11 @@ const geistMono = localFont({
 
 export const metadata: Metadata = {
   title: "ephemeral.",
-  description: "Upload your temporary bits",
+  description: "Share files that self-destruct - temporary, secure, simple",
+  keywords: ["file sharing", "temporary files", "ephemeral", "secure upload", "file transfer"],
+  authors: [{ name: "ephemeral." }],
+  viewport: "width=device-width, initial-scale=1",
+  themeColor: "#6366f1",
 };
 
 export default function RootLayout({
@@ -27,16 +31,16 @@ export default function RootLayout({
   return (
     <html suppressHydrationWarning lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased font-sans`}
       >
         <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
-            {children}
-          </ThemeProvider>
+          attribute="class"
+          defaultTheme="system"
+          enableSystem={true}
+          disableTransitionOnChange={false}
+        >
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );

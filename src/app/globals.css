@@ -4,6 +4,157 @@
 
 @layer base {
   :root {
-    --radius: 0.5rem;
+    --radius: 0.75rem;
+    --brand-1: #6366f1; /* indigo-500 */
+    --brand-2: #06b6d4; /* cyan-500 */
+    --brand-3: #8b5cf6; /* purple-500 */
+    --muted: #6b7280; /* zinc-500 */
+    --bg-light: #f8fafc; /* slate-50 */
+    --surface: #ffffff;
+    --shadow-primary: 0 25px 50px -12px rgba(99, 102, 241, 0.25);
+    --shadow-glow: 0 0 50px rgba(99, 102, 241, 0.15);
+    
+    /* Light mode colors */
+    --background: 248 250 252; /* slate-50 */
+    --foreground: 15 23 42; /* slate-900 */
+    --card: 255 255 255; /* white */
+    --card-foreground: 15 23 42; /* slate-900 */
+    --popover: 255 255 255; /* white */
+    --popover-foreground: 15 23 42; /* slate-900 */
+    --primary: 99 102 241; /* indigo-500 */
+    --primary-foreground: 248 250 252; /* slate-50 */
+    --secondary: 241 245 249; /* slate-100 */
+    --secondary-foreground: 15 23 42; /* slate-900 */
+    --muted-bg: 241 245 249; /* slate-100 */
+    --muted-foreground: 100 116 139; /* slate-500 */
+    --accent: 241 245 249; /* slate-100 */
+    --accent-foreground: 15 23 42; /* slate-900 */
+    --destructive: 239 68 68; /* red-500 */
+    --destructive-foreground: 248 250 252; /* slate-50 */
+    --border: 226 232 240; /* slate-200 */
+    --input: 226 232 240; /* slate-200 */
+    --ring: 99 102 241; /* indigo-500 */
+  }
+
+  .dark {
+    --background: 2 6 23; /* slate-950 */
+    --foreground: 248 250 252; /* slate-50 */
+    --card: 15 23 42; /* slate-900 */
+    --card-foreground: 248 250 252; /* slate-50 */
+    --popover: 15 23 42; /* slate-900 */
+    --popover-foreground: 248 250 252; /* slate-50 */
+    --primary: 129 140 248; /* indigo-400 */
+    --primary-foreground: 15 23 42; /* slate-900 */
+    --secondary: 30 41 59; /* slate-800 */
+    --secondary-foreground: 248 250 252; /* slate-50 */
+    --muted-bg: 30 41 59; /* slate-800 */
+    --muted-foreground: 148 163 184; /* slate-400 */
+    --accent: 30 41 59; /* slate-800 */
+    --accent-foreground: 248 250 252; /* slate-50 */
+    --destructive: 220 38 38; /* red-600 */
+    --destructive-foreground: 248 250 252; /* slate-50 */
+    --border: 30 41 59; /* slate-800 */
+    --input: 30 41 59; /* slate-800 */
+    --ring: 129 140 248; /* indigo-400 */
+    
+    /* Dark mode overrides */
+    --bg-light: 2 6 23; /* slate-950 */
+    --surface: 15 23 42; /* slate-900 */
+    --shadow-primary: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    --shadow-glow: 0 0 50px rgba(129, 140, 248, 0.15);
+  }
+
+  html, body, #__next {
+    height: 100%;
+  }
+
+  body {
+    background-color: var(--bg-light);
+    color: rgb(17 24 39); /* zinc-900 */
+    font-family: 'Geist', ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-feature-settings: "cv01", "cv02", "cv03", "cv04";
+  }
+
+  ::selection {
+    background: linear-gradient(135deg, rgba(99,102,241,0.3), rgba(139,92,246,0.3));
+    color: rgb(17 24 39);
+  }
+
+  .container {
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+    max-width: 72rem;
+  }
+
+  /* Enhanced glass effect */
+  .glass {
+    background: rgba(255,255,255,0.8);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.2);
+  }
+
+  /* Floating animation */
+  @keyframes float {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    33% { transform: translateY(-10px) rotate(1deg); }
+    66% { transform: translateY(-5px) rotate(-1deg); }
+  }
+
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  /* Gradient text animation */
+  @keyframes gradient-x {
+    0%, 100% {
+      background-size: 200% 200%;
+      background-position: left center;
+    }
+    50% {
+      background-size: 200% 200%;
+      background-position: right center;
+    }
+  }
+
+  .animate-gradient-x {
+    animation: gradient-x 3s ease infinite;
+  }
+
+  /* Pulse glow effect */
+  @keyframes pulse-glow {
+    0%, 100% { box-shadow: 0 0 20px rgba(99, 102, 241, 0.3); }
+    50% { box-shadow: 0 0 40px rgba(99, 102, 241, 0.6), 0 0 60px rgba(139, 92, 246, 0.4); }
+  }
+
+  .animate-pulse-glow {
+    animation: pulse-glow 2s ease-in-out infinite;
+  }
+
+  /* Scale in animation */
+  @keyframes scale-in {
+    0% { 
+      opacity: 0; 
+      transform: scale(0.9) translateY(10px); 
+    }
+    100% { 
+      opacity: 1; 
+      transform: scale(1) translateY(0px); 
+    }
+  }
+
+  .animate-scale-in {
+    animation: scale-in 0.3s ease-out;
+  }
+
+  /* Smooth focus rings */
+  .focus-ring:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2), 0 0 0 4px white;
+    transition: all 0.2s ease;
   }
 }

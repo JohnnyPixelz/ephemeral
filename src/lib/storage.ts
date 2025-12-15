@@ -4,11 +4,29 @@ import { v4 } from "uuid";
 import crypto from "crypto";
 
 // Store file metadata including filename and encryption IV
-const files = new Map<string, { fileName: string; iv: string }>();
+interface GlobalWithEphemeral extends Object {
+  __ephemeral_files: Map<string, { fileName: string; iv: string }> | undefined;
+  __ephemeral_key: string | undefined;
+}
+
+const globalWithEphemeral = globalThis as unknown as GlobalWithEphemeral;
+
+const files = globalWithEphemeral.__ephemeral_files || new Map<string, { fileName: string; iv: string }>();
+
+if (!globalWithEphemeral.__ephemeral_files) {
+  globalWithEphemeral.__ephemeral_files = files;
+}
 
 // Generate a secret key at runtime - this will be different for each server restart
-const ENCRYPTION_KEY = crypto.randomBytes(32).toString('hex'); // 256-bit key as hex string
-console.log("🔐 Encryption key generated for this session");
+// But assume stickiness if in HMR
+const ENCRYPTION_KEY = globalWithEphemeral.__ephemeral_key || crypto.randomBytes(32).toString('hex'); // 256-bit key as hex string
+
+if (!globalWithEphemeral.__ephemeral_key) {
+  globalWithEphemeral.__ephemeral_key = ENCRYPTION_KEY;
+  console.log("🔐 Encryption key generated for this session");
+} else {
+  console.log("🔐 Encryption key restored from global scope");
+}
 
 /**
  * Encrypts data using AES-256-CTR
@@ -17,7 +35,7 @@ function encrypt(data: Buffer): { encryptedData: string; iv: string } {
   try {
     const iv = crypto.randomBytes(16);
     const key = crypto.scryptSync(ENCRYPTION_KEY, 'salt', 32); // Derive 32-byte key
-    
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const cipher = crypto.createCipheriv('aes-256-ctr', key as any, iv as any);
     const encryptedParts: Buffer[] = [];
@@ -26,7 +44,7 @@ function encrypt(data: Buffer): { encryptedData: string; iv: string } {
     encryptedParts.push(cipher.final());
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const encrypted = Buffer.concat(encryptedParts as any);
-    
+
     return { encryptedData: encrypted.toString('hex'), iv: iv.toString('hex') };
   } catch (error) {
     console.error('Encryption failed:', error);
@@ -42,14 +60,14 @@ function decrypt(encryptedData: string, ivHex: string): Buffer {
     const iv = Buffer.from(ivHex, 'hex');
     const key = crypto.scryptSync(ENCRYPTION_KEY, 'salt', 32); // Derive same 32-byte key
     const encrypted = Buffer.from(encryptedData, 'hex');
-    
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const decipher = crypto.createDecipheriv('aes-256-ctr', key as any, iv as any);
     const decryptedParts: Buffer[] = [];
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     decryptedParts.push(decipher.update(encrypted as any));
     decryptedParts.push(decipher.final());
-    
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return Buffer.concat(decryptedParts as any);
   } catch (error) {
@@ -62,10 +80,10 @@ export async function write(name: string, data: Buffer) {
   await mkdir(path.join(process.cwd(), "data"), { recursive: true });
 
   const uuid = v4();
-  
+
   // Encrypt the file data
   const { encryptedData, iv } = encrypt(data);
-  
+
   // Store metadata (filename and IV for decryption)
   files.set(uuid, { fileName: name, iv });
 
@@ -82,23 +100,13 @@ export async function read(uuid: string) {
   const fileMetadata = files.get(uuid);
 
   if (!fileMetadata) {
-    // Handle legacy files (unencrypted files from before encryption was implemented)
-    try {
-      const buffer = await readFile(filePath);
-      console.log(`📄 Legacy file read: ${uuid} (${buffer.length} bytes) - unencrypted`);
-      return {
-        buffer,
-        fileName: 'unknown-file' // We don't have the original filename for legacy files
-      };
-    } catch {
-      throw new Error("File not found");
-    }
+    throw new Error("File not found");
   }
 
   try {
     // Read encrypted data
     const encryptedData = await readFile(filePath, 'utf8');
-    
+
     // Decrypt the data
     const buffer = decrypt(encryptedData, fileMetadata.iv);
 

@@ -4,7 +4,7 @@ import { v4 } from "uuid";
 import crypto from "crypto";
 
 // Store file metadata including filename and encryption IV
-interface GlobalWithEphemeral extends Object {
+interface GlobalWithEphemeral {
   __ephemeral_files: Map<string, { fileName: string; iv: string }> | undefined;
   __ephemeral_key: string | undefined;
 }

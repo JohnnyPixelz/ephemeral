@@ -1,11 +1,12 @@
 import { read } from "@/lib/storage";
 
-export async function GET(request: Request, { params }: { params: { uuid: string } }) {
+export async function GET(request: Request, props: { params: Promise<{ uuid: string }> }) {
+  const params = await props.params;
   let file;
 
   try {
     file = await read(params.uuid);
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+     
   } catch (error) {
     console.log(error);
     console.log(`[Download] uuid: ${params.uuid}, not found.`)
@@ -14,7 +15,7 @@ export async function GET(request: Request, { params }: { params: { uuid: string
 
   console.log(`[Download] name: ${file.fileName}, size: ${file.buffer.length}, uuid: ${params.uuid}`)
 
-  return new Response(file.buffer, {
+  return new Response(file.buffer as unknown as BodyInit, {
     status: 200,
     headers: {
       "Content-Length": `${file.buffer.length}`,

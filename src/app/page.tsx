@@ -37,6 +37,7 @@ function MainPage() {
   const [copiedFileId, setCopiedFileId] = useState<string | null>(null)
   const { theme, setTheme } = useTheme()
 
+  // eslint-disable-next-line
   useEffect(() => setOrigin(`${window.location.protocol}//${window.location.host}`), [])
 
   useEffect(() => {
@@ -115,7 +116,7 @@ function MainPage() {
       await navigator.clipboard.writeText(url)
       setCopyMsg("Copied!")
       setCopiedFileId(fileId)
-      
+
       // Reset the icon back to copy after 3 seconds
       setTimeout(() => {
         setCopiedFileId(null)
@@ -144,12 +145,12 @@ function MainPage() {
             <a className="text-sm text-zinc-600 dark:text-zinc-300 hover:text-indigo-600 dark:hover:text-indigo-400 font-medium transition-colors duration-200 hover:scale-105 transform" href="#">
               Docs
             </a>
-            <button 
-              onClick={toggleTheme} 
+            <button
+              onClick={toggleTheme}
               className="p-3 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-white/20 dark:border-slate-700/20 shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 group"
             >
-              {theme === "dark" ? 
-                <Sun className="h-4 w-4 text-amber-500 group-hover:rotate-180 transition-transform duration-300" /> : 
+              {theme === "dark" ?
+                <Sun className="h-4 w-4 text-amber-500 group-hover:rotate-180 transition-transform duration-300" /> :
                 <Moon className="h-4 w-4 text-slate-600 dark:text-slate-400 group-hover:-rotate-12 transition-transform duration-300" />
               }
             </button>
@@ -161,7 +162,7 @@ function MainPage() {
         <div className="max-w-6xl w-full px-6 container">
           <header className="text-center mb-16">
             <h1 className="text-6xl md:text-7xl lg:text-8xl font-black leading-none bg-gradient-to-r from-indigo-600 via-purple-600 to-cyan-600 dark:from-indigo-400 dark:via-purple-400 dark:to-cyan-400 bg-clip-text text-transparent mb-6">
-              Share files in 
+              Share files in
               <span className="block text-slate-900 dark:text-slate-100 transition-colors duration-300">seconds</span>
             </h1>
             <p className="text-xl md:text-2xl text-zinc-600 dark:text-zinc-300 max-w-3xl mx-auto leading-relaxed font-medium transition-colors duration-300">
@@ -190,7 +191,7 @@ function MainPage() {
             <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 via-purple-500/5 to-cyan-500/5 dark:from-indigo-400/5 dark:via-purple-400/5 dark:to-cyan-400/5 rounded-3xl"></div>
             <div className="absolute top-4 right-4 w-32 h-32 bg-gradient-to-br from-pink-200/20 to-indigo-200/20 dark:from-pink-300/10 dark:to-indigo-300/10 rounded-full blur-2xl"></div>
             <div className="absolute bottom-4 left-4 w-24 h-24 bg-gradient-to-br from-cyan-200/20 to-purple-200/20 dark:from-cyan-300/10 dark:to-purple-300/10 rounded-full blur-2xl"></div>
-            
+
             {/* Drop area */}
             <div
               onDrop={handleDrop}
@@ -199,11 +200,10 @@ function MainPage() {
               role="button"
               tabIndex={0}
               onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') inputRef.current?.click() }}
-              className={`relative w-full rounded-2xl border-2 border-dotted transition-all duration-300 p-16 text-center group cursor-pointer ${
-                isDragging 
-                  ? 'border-indigo-400 dark:border-indigo-500 shadow-2xl bg-gradient-to-br from-indigo-50/80 via-purple-50/80 to-cyan-50/80 dark:from-indigo-900/30 dark:via-purple-900/30 dark:to-cyan-900/30 scale-[1.02] transform' 
-                  : 'border-zinc-300/60 dark:border-slate-600/60 bg-white/40 dark:bg-slate-800/40 hover:border-indigo-300 dark:hover:border-indigo-500 hover:bg-white/60 dark:hover:bg-slate-800/60 hover:shadow-xl'
-              }`}
+              className={`relative w-full rounded-2xl border-2 border-dotted transition-all duration-300 p-16 text-center group cursor-pointer ${isDragging
+                ? 'border-indigo-400 dark:border-indigo-500 shadow-2xl bg-gradient-to-br from-indigo-50/80 via-purple-50/80 to-cyan-50/80 dark:from-indigo-900/30 dark:via-purple-900/30 dark:to-cyan-900/30 scale-[1.02] transform'
+                : 'border-zinc-300/60 dark:border-slate-600/60 bg-white/40 dark:bg-slate-800/40 hover:border-indigo-300 dark:hover:border-indigo-500 hover:bg-white/60 dark:hover:bg-slate-800/60 hover:shadow-xl'
+                }`}
             >
               <div className="max-w-4xl mx-auto relative z-10">
                 <div className={`rounded-2xl bg-gradient-to-br from-indigo-600 via-purple-600 to-cyan-500 dark:from-indigo-500 dark:via-purple-500 dark:to-cyan-400 p-6 shadow-2xl inline-block transition-transform duration-300 ${isDragging ? 'scale-110 rotate-3' : 'group-hover:scale-105 group-hover:-rotate-1'}`}>
@@ -213,8 +213,8 @@ function MainPage() {
                   {isDragging ? "Drop it like it's hot! 🔥" : "Drop your files here"}
                 </h3>
                 <p className="text-lg text-zinc-600 dark:text-zinc-300 max-w-2xl mx-auto mt-4 leading-relaxed transition-colors duration-300">
-                  {isDragging 
-                    ? "Release to upload your files — they'll be ready in seconds!" 
+                  {isDragging
+                    ? "Release to upload your files — they'll be ready in seconds!"
                     : "Drag & drop any files, or click browse. Maximum security, minimum fuss."
                   }
                 </p>
@@ -253,8 +253,8 @@ function MainPage() {
                   </div>
                 )}
                 {files.map((f, index) => (
-                  <div 
-                    key={f.id} 
+                  <div
+                    key={f.id}
                     className="group flex items-center justify-between gap-4 bg-white/60 dark:bg-slate-800/60 backdrop-blur border border-white/20 dark:border-slate-700/20 p-5 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
                     style={{ animationDelay: `${index * 100}ms` }}
                   >
@@ -282,16 +282,16 @@ function MainPage() {
                       {!f.url && <ProgressBar value={f.progress} />}
                       {f.url && (
                         <div className="flex items-center gap-3">
-                          <a 
-                            href={`${origin}${f.url}`} 
-                            target="_blank" 
-                            rel="noreferrer" 
+                          <a
+                            href={`${origin}${f.url}`}
+                            target="_blank"
+                            rel="noreferrer"
                             className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 text-sm font-medium truncate max-w-[12rem] bg-indigo-50 dark:bg-indigo-900/30 px-3 py-1 rounded-lg transition-colors duration-300"
                           >
                             {f.url}
                           </a>
-                          <button 
-                            onClick={() => handleCopy(`${origin}${f.url}`, f.id)} 
+                          <button
+                            onClick={() => handleCopy(`${origin}${f.url}`, f.id)}
                             className="p-3 rounded-xl bg-white/80 dark:bg-slate-800/80 border border-white/20 dark:border-slate-700/20 shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 group/copy"
                           >
                             {copiedFileId === f.id ? (
@@ -302,8 +302,8 @@ function MainPage() {
                           </button>
                         </div>
                       )}
-                      <button 
-                        onClick={() => setFiles((s) => s.filter((x) => x.id !== f.id))} 
+                      <button
+                        onClick={() => setFiles((s) => s.filter((x) => x.id !== f.id))}
                         className="p-3 rounded-xl bg-white/80 dark:bg-slate-800/80 border border-white/20 dark:border-slate-700/20 shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 hover:bg-red-50 dark:hover:bg-red-900/20 group/delete"
                       >
                         <Trash2 className="h-4 w-4 text-zinc-400 dark:text-zinc-500 group-hover/delete:text-red-500 dark:group-hover/delete:text-red-400 transition-colors" />
@@ -336,8 +336,8 @@ function ProgressBar({ value }: { value?: number }) {
   return (
     <div className="flex items-center gap-3">
       <div className="w-32 h-3 bg-gradient-to-r from-zinc-200 to-zinc-100 dark:from-slate-700 dark:to-slate-600 rounded-full overflow-hidden shadow-inner transition-colors duration-300">
-        <div 
-          style={{ width: `${v}%` }} 
+        <div
+          style={{ width: `${v}%` }}
           className="h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-cyan-500 dark:from-indigo-400 dark:via-purple-400 dark:to-cyan-400 rounded-full transition-all duration-300 shadow-sm relative"
         >
           <div className="absolute inset-0 bg-gradient-to-r from-white/30 to-transparent rounded-full"></div>
@@ -349,6 +349,7 @@ function ProgressBar({ value }: { value?: number }) {
 }
 
 function ExpiryLabel({ expiresAt }: { expiresAt: number }) {
+  // eslint-disable-next-line
   const [remaining, setRemaining] = useState<number>(Math.max(0, expiresAt - Date.now()))
 
   useEffect(() => {
@@ -364,17 +365,16 @@ function ExpiryLabel({ expiresAt }: { expiresAt: number }) {
       </span>
     )
   }
-  
+
   const m = Math.floor(remaining / 60000)
   const s = Math.floor((remaining % 60000) / 1000)
   const isUrgent = remaining < 120000 // Less than 2 minutes
-  
+
   return (
-    <span className={`inline-flex items-center gap-1 text-xs font-semibold px-2 py-1 rounded-full transition-colors duration-300 ${
-      isUrgent 
-        ? 'text-amber-700 dark:text-amber-300 bg-amber-100 dark:bg-amber-900/30 animate-pulse' 
-        : 'text-emerald-700 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-900/30'
-    }`}>
+    <span className={`inline-flex items-center gap-1 text-xs font-semibold px-2 py-1 rounded-full transition-colors duration-300 ${isUrgent
+      ? 'text-amber-700 dark:text-amber-300 bg-amber-100 dark:bg-amber-900/30 animate-pulse'
+      : 'text-emerald-700 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-900/30'
+      }`}>
       <div className={`w-2 h-2 rounded-full ${isUrgent ? 'bg-amber-500 dark:bg-amber-400' : 'bg-emerald-500 dark:bg-emerald-400'}`}></div>
       expires in {m}:{s.toString().padStart(2, "0")}
     </span>

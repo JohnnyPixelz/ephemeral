@@ -1,4 +1,4 @@
-import { read } from "@/lib/storage";
+import { read, remove } from "@/lib/storage";
 
 export async function GET(request: Request, props: { params: Promise<{ uuid: string }> }) {
   const params = await props.params;
@@ -6,7 +6,7 @@ export async function GET(request: Request, props: { params: Promise<{ uuid: str
 
   try {
     file = await read(params.uuid);
-     
+
   } catch (error) {
     console.log(error);
     console.log(`[Download] uuid: ${params.uuid}, not found.`)
@@ -22,4 +22,18 @@ export async function GET(request: Request, props: { params: Promise<{ uuid: str
       "Content-Disposition": `attachment; filename="${file.fileName}"` // Suggest filename for download
     }
   })
+}
+
+export async function DELETE(request: Request, props: { params: Promise<{ uuid: string }> }) {
+  const params = await props.params;
+
+  try {
+    await read(params.uuid); // Check if exists
+
+    await remove(params.uuid);
+    return Response.json({ success: true });
+  } catch (error) {
+    console.log(error);
+    return Response.json({ error: "File not found or could not be deleted." }, { status: 404 });
+  }
 }

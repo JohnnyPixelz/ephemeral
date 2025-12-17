@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import { ThemeProvider } from "next-themes";
 import "./globals.css";
@@ -19,7 +19,11 @@ export const metadata: Metadata = {
   description: "Share files that self-destruct - temporary, secure, simple",
   keywords: ["file sharing", "temporary files", "ephemeral", "secure upload", "file transfer"],
   authors: [{ name: "ephemeral." }],
-  viewport: "width=device-width, initial-scale=1",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
   themeColor: "#6366f1",
 };
 

@@ -6,24 +6,29 @@ import { useEffect, useRef, useState } from "react"
 import { v4 } from "uuid"
 import { useTheme } from "next-themes"
 
-type EphemeralFile = {
+type CommonFileProps = {
   id: string
-  file: File
-  progress: number
+  serverId?: string
   url?: string
   uploadedAt?: number
   expiresAt?: number
 }
 
+type EphemeralFile = CommonFileProps & {
+  file: File
+  progress: number
+}
+
+type StoredFile = Required<CommonFileProps> & {
+  name: string
+  size: number
+  type: string
+}
+
 export default function Page() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/40 dark:from-slate-950 dark:via-slate-900/50 dark:to-slate-800/40 text-zinc-900 dark:text-zinc-100 relative overflow-hidden transition-colors duration-300">
-      {/* Animated background blobs */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-96 h-96 bg-gradient-to-r from-pink-300/20 to-indigo-300/20 dark:from-pink-400/10 dark:to-indigo-400/10 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-gradient-to-r from-cyan-300/20 to-purple-300/20 dark:from-cyan-400/10 dark:to-purple-400/10 rounded-full blur-3xl animate-pulse delay-1000" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-r from-blue-200/10 to-indigo-200/10 dark:from-blue-400/5 dark:to-indigo-400/5 rounded-full blur-3xl animate-pulse delay-500" />
-      </div>
+
       <MainPage />
     </div>
   )
@@ -37,8 +42,61 @@ function MainPage() {
   const [copiedFileId, setCopiedFileId] = useState<string | null>(null)
   const { theme, setTheme } = useTheme()
 
-  // eslint-disable-next-line
-  useEffect(() => setOrigin(`${window.location.protocol}//${window.location.host}`), [])
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => {
+    // eslint-disable-next-line
+    setOrigin(`${window.location.protocol}//${window.location.host}`)
+    setMounted(true)
+
+    // Hydrate from localStorage
+    try {
+      const stored = localStorage.getItem("ephemeral_files")
+      if (stored) {
+        const parsed: StoredFile[] = JSON.parse(stored)
+        const now = Date.now()
+        const valid = parsed.filter((f) => f.expiresAt > now)
+
+        const rehydrated: EphemeralFile[] = valid.map((f) => ({
+          id: f.id,
+          serverId: f.serverId,
+          file: {
+            name: f.name,
+            size: f.size,
+            type: f.type,
+          } as File, // Mock File object for display purposes
+          progress: 100,
+          url: f.url,
+          uploadedAt: f.uploadedAt,
+          expiresAt: f.expiresAt,
+        }))
+
+        if (rehydrated.length > 0) {
+          setFiles((prev) => [...rehydrated, ...prev])
+        }
+      }
+    } catch (e) {
+      console.error("Failed to hydrate files", e)
+    }
+  }, [])
+
+  // Persist to localStorage
+  useEffect(() => {
+    if (!mounted) return
+    const toStore: StoredFile[] = files
+      .filter((f) => f.url && f.expiresAt && f.expiresAt > Date.now())
+      .map((f) => ({
+        id: f.id,
+        serverId: f.serverId!,
+        name: f.file.name,
+        size: f.file.size,
+        type: f.file.type,
+        url: f.url!,
+        uploadedAt: f.uploadedAt!,
+        expiresAt: f.expiresAt!,
+      }))
+
+    localStorage.setItem("ephemeral_files", JSON.stringify(toStore))
+  }, [files, mounted])
 
   useEffect(() => {
     if (!copyMsg) return
@@ -94,9 +152,10 @@ function MainPage() {
         },
       }).then((res) => {
         const url = res.data?.url
+        const serverId = res.data?.uuid
         const uploadedAt = Date.now()
         const expiresAt = uploadedAt + 10 * 60 * 1000 // 10 minutes
-        setFiles((s) => s.map((x) => (x.id === ef.id ? { ...x, url, uploadedAt, expiresAt, progress: 100 } : x)))
+        setFiles((s) => s.map((x) => (x.id === ef.id ? { ...x, url, serverId, uploadedAt, expiresAt, progress: 100 } : x)))
       })
     } catch (err) {
       console.error("upload failed", err)
@@ -149,10 +208,10 @@ function MainPage() {
               onClick={toggleTheme}
               className="p-3 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-white/20 dark:border-slate-700/20 shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 group"
             >
-              {theme === "dark" ?
+              {mounted && (theme === "dark" ?
                 <Sun className="h-4 w-4 text-amber-500 group-hover:rotate-180 transition-transform duration-300" /> :
                 <Moon className="h-4 w-4 text-slate-600 dark:text-slate-400 group-hover:-rotate-12 transition-transform duration-300" />
-              }
+              )}
             </button>
           </div>
         </div>
@@ -189,8 +248,7 @@ function MainPage() {
           <section className="relative backdrop-blur-xl bg-white/30 dark:bg-slate-900/30 rounded-3xl shadow-2xl border border-white/20 dark:border-slate-700/20 p-8 md:p-12 overflow-hidden transition-colors duration-300">
             {/* Decorative elements */}
             <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 via-purple-500/5 to-cyan-500/5 dark:from-indigo-400/5 dark:via-purple-400/5 dark:to-cyan-400/5 rounded-3xl"></div>
-            <div className="absolute top-4 right-4 w-32 h-32 bg-gradient-to-br from-pink-200/20 to-indigo-200/20 dark:from-pink-300/10 dark:to-indigo-300/10 rounded-full blur-2xl"></div>
-            <div className="absolute bottom-4 left-4 w-24 h-24 bg-gradient-to-br from-cyan-200/20 to-purple-200/20 dark:from-cyan-300/10 dark:to-purple-300/10 rounded-full blur-2xl"></div>
+
 
             {/* Drop area */}
             <div
@@ -303,7 +361,16 @@ function MainPage() {
                         </div>
                       )}
                       <button
-                        onClick={() => setFiles((s) => s.filter((x) => x.id !== f.id))}
+                        onClick={async () => {
+                          if (f.serverId) {
+                            try {
+                              await axios.delete(`/download/${f.serverId}`)
+                            } catch (e) {
+                              console.error("Failed to delete file on server", e)
+                            }
+                          }
+                          setFiles((s) => s.filter((x) => x.id !== f.id))
+                        }}
                         className="p-3 rounded-xl bg-white/80 dark:bg-slate-800/80 border border-white/20 dark:border-slate-700/20 shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 hover:bg-red-50 dark:hover:bg-red-900/20 group/delete"
                       >
                         <Trash2 className="h-4 w-4 text-zinc-400 dark:text-zinc-500 group-hover/delete:text-red-500 dark:group-hover/delete:text-red-400 transition-colors" />

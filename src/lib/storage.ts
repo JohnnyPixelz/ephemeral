@@ -154,3 +154,21 @@ export async function cleanOldFiles(maxAge: number) {
     console.error('Error cleaning old files:', error);
   }
 }
+
+export async function remove(uuid: string) {
+  const filePath = path.join(process.cwd(), "data", uuid);
+  const fileMetadata = files.get(uuid);
+
+  if (!fileMetadata) {
+    throw new Error("File not found");
+  }
+
+  try {
+    await unlink(filePath);
+    files.delete(uuid);
+    console.log(`🗑️  Deleted file: ${fileMetadata.fileName} -> ${uuid}`);
+  } catch (error) {
+    console.error(`Failed to delete file ${uuid}:`, error);
+    throw new Error("Failed to delete file");
+  }
+}

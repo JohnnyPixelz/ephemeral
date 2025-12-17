@@ -1,0 +1,12 @@
+services:
+  ephemeral:
+    build: .
+    environment:
+      NODE_ENV: production
+      MAX_FILE_AGE: 600000
+    restart: always # Restarts the container automatically on failure
+    volumes:
+      - app-data:/app/data # Volume for persistent storage
+
+volumes:
+  app-data:
